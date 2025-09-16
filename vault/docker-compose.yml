@@ -1,0 +1,22 @@
+services:
+  vault:
+    image: bitnami/vault:latest
+    container_name: vault
+    restart: unless-stopped
+    environment:
+      VAULT_DISABLE_MLOCK: true
+      VAULT_SKIP_VERIFY: true
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - /opt/vault/data:/bitnami/vault/data
+      - /opt/vault/config:/bitnami/vault/config
+    command: "server -config=/bitnami/vault/config/config.hcl"
+    ports:
+      - 8200:8200
+    networks:
+      - supabase_default
+
+networks:
+  supabase_default:
+    external: true

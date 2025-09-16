@@ -1,0 +1,10 @@
+vault/data/*
+!vault/data/
+!vault/data/.gitkeep
+init-keys.json
+vault/setup/ROOT_CERT/*
+!vault/setup/ROOT_CERT/.gitkeep
+vault/setup/INT_CERTS/*
+!vault/setup/INT_CERTS/.gitkeep
+vault/setup/USER_CERTS/*
+!vault/setup/USER_CERTS/.gitkeep
