@@ -1,4 +1,4 @@
-# alt_names="jane.smith@zorro.com"
+# alt_names="jane.smith@jimsnet"
 
 
 vault write jimsnet_abc_vendor1/issue/digital_signing \

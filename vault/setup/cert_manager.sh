@@ -242,6 +242,14 @@ case $ACTION in
     ENCRYPTED_KEY_FILE="USER_CERTS/${CLIENT_NAME}/${VENDOR_NAME}/${CN// /_}_encrypted_key.pem"
     PFX_FILE="USER_CERTS/${CLIENT_NAME}/${VENDOR_NAME}/${CN// /_}.p12"
     
+    # Get intermediate CA certificate
+    INT_CERT_FILE="INT_CERTS/${BASE_NAME}/${CLIENT_NAME}/${BASE_NAME}_${CLIENT_NAME}_${VENDOR_NAME}_int-ca.crt"
+    
+    if [ ! -f "$INT_CERT_FILE" ]; then
+        echo "Error: Intermediate CA certificate not found: $INT_CERT_FILE"
+        exit 1
+    fi
+    
     # Check which key file exists
     if [ -f "$ENCRYPTED_KEY_FILE" ]; then
         KEY_FILE_TO_USE="$ENCRYPTED_KEY_FILE"
@@ -251,7 +259,6 @@ case $ACTION in
         IS_ENCRYPTED=false
     else
         echo "Error: No certificate or key files found for: $CN"
-        echo "Checked: $CERT_FILE and $KEY_FILE"
         exit 1
     fi
     
@@ -270,11 +277,14 @@ case $ACTION in
         exit 1
     fi
     
+    # Create a temporary file with certificate chain
+    cat "$CERT_FILE" "$INT_CERT_FILE" > "${CERT_FILE}.chain"
+    
     if [ "$IS_ENCRYPTED" = true ]; then
         read -sp "Enter private key password: " KEY_PASSWORD
         echo
         openssl pkcs12 -export \
-            -in "$CERT_FILE" \
+            -in "${CERT_FILE}.chain" \
             -inkey "$KEY_FILE_TO_USE" \
             -out "$PFX_FILE" \
             -name "$CN Digital Signature" \
@@ -282,15 +292,18 @@ case $ACTION in
             -passout pass:"$PFX_PASSWORD"
     else
         openssl pkcs12 -export \
-            -in "$CERT_FILE" \
+            -in "${CERT_FILE}.chain" \
             -inkey "$KEY_FILE_TO_USE" \
             -out "$PFX_FILE" \
             -name "$CN Digital Signature" \
             -passout pass:"$PFX_PASSWORD"
     fi
     
+    # Clean up temporary file
+    rm -f "${CERT_FILE}.chain"
+    
     if [ $? -eq 0 ]; then
-        echo "PKCS#12 file created: $PFX_FILE"
+        echo "PKCS#12 file with full chain created: $PFX_FILE"
         echo "Use this password to import into Adobe Acrobat or other applications"
         chmod 600 "$PFX_FILE"
     else

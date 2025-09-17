@@ -144,10 +144,12 @@ echo "Creating digital signing role for user certificates..."
 vault write $PKI_PATH_INT/roles/digital_signing \
     allow_any_name=true \
     enforce_hostnames=false \
-    server_flag=false \
+    server_flag=true \
     client_flag=true \
-    key_usage="DigitalSignature,NonRepudiation" \
-    ext_key_usage="1.3.6.1.5.5.7.3.4" \
+    code_signing_flag=true \
+    document_signing_flag=true \
+    key_usage="DigitalSignature,NonRepudiation,KeyEncipherment,DataEncipherment,KeyAgreement" \
+    ext_key_usage="1.3.6.1.5.5.7.3.1,1.3.6.1.5.5.7.3.2,1.3.6.1.5.5.7.3.3,1.3.6.1.5.5.7.3.4,1.3.6.1.4.1.311.10.3.12" \
     max_ttl=8760h \
     use_csr_common_name=true \
     no_store=false
