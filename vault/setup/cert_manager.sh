@@ -1,6 +1,14 @@
 #!/bin/bash
 # Complete PKI Certificate Management
 
+# Prompt for VENDOR_NAME if not already set
+if [ -z "$VENDOR_NAME" ]; then
+    read -p "Enter vendor name [${VENDOR_NAME:-vendor1}]: " INPUT_VENDOR_NAME
+    if [ -n "$INPUT_VENDOR_NAME" ]; then
+        VENDOR_NAME="$INPUT_VENDOR_NAME"
+    fi
+fi
+
 # Default values (can be overridden with environment variables)
 BASE_NAME="${BASE_NAME:-jimsnet}"
 CLIENT_NAME="${CLIENT_NAME:-client1}"
